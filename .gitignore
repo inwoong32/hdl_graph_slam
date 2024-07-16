@@ -3,6 +3,8 @@ imgui.ini
 hdl_graph_slam/src/fast_gicp 
 hdl_graph_slam/src/ndt_omp
 hdl_graph_slam/src/CMakeLists.txt
+hdl_graph_slam/src/.vscode
 hdl_graph_slam/build
 hdl_graph_slam/devel
 hdl_graph_slam/log
+hdl_graph_slam/.catkin_workspace
