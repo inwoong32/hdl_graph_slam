@@ -23,7 +23,6 @@ find_package(catkin REQUIRED COMPONENTS
   interactive_markers
   message_generation
   ndt_omp
-  topic_con
   nmea_msgs
   pcl_ros
   roscpp

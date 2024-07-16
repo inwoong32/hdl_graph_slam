@@ -173,5 +173,4 @@
   </node>
 
   <node pkg="hdl_graph_slam" type="map2odom_publisher.py" name="map2odom_publisher" />
-  <!-- <node pkg="topic_con" type="topic_con" name="topic_con" /> -->
 </launch>

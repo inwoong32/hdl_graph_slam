@@ -20,7 +20,6 @@
   <depend>nmea_msgs</depend>
   <depend>pcl_ros</depend>
   <depend>roscpp</depend>
-  <depend>topic_con</depend>
   <depend>rospy</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
