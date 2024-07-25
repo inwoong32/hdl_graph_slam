@@ -99,6 +99,8 @@ public:
     gps_time_offset = private_nh.param<double>("gps_time_offset", 0.0);
     gps_edge_stddev_xy = private_nh.param<double>("gps_edge_stddev_xy", 10000.0);
     gps_edge_stddev_z = private_nh.param<double>("gps_edge_stddev_z", 10.0);
+    gps_rate = private_nh.param<double>("gps_rate", 20);
+    gps_sample_rate = gps_rate;
     floor_edge_stddev = private_nh.param<double>("floor_edge_stddev", 10.0);
 
     imu_time_offset = private_nh.param<double>("imu_time_offset", 0.0);
@@ -283,8 +285,14 @@ private:
    */
   void gps_callback(const geographic_msgs::GeoPointStampedPtr& gps_msg) {
     std::lock_guard<std::mutex> lock(gps_queue_mutex);
-    gps_msg->header.stamp += ros::Duration(gps_time_offset);
-    gps_queue.push_back(gps_msg);
+
+    if(gps_sample_rate == gps_rate)
+    {
+      gps_msg->header.stamp += ros::Duration(gps_time_offset);
+      gps_queue.push_back(gps_msg);
+    }
+    gps_sample_rate--;
+    if(gps_sample_rate <= 0) gps_sample_rate = gps_rate;
   }
 
   /**
@@ -1075,6 +1083,8 @@ private:
   double gps_time_offset;
   double gps_edge_stddev_xy;
   double gps_edge_stddev_z;
+  int gps_rate;
+  int gps_sample_rate;
   boost::optional<Eigen::Vector3d> zero_utm;
   std::mutex gps_queue_mutex;
   std::deque<geographic_msgs::GeoPointStampedConstPtr> gps_queue;
