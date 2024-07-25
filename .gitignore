@@ -8,3 +8,4 @@ hdl_graph_slam/build
 hdl_graph_slam/devel
 hdl_graph_slam/log
 hdl_graph_slam/.catkin_workspace
+hdl_graph_slam/map
