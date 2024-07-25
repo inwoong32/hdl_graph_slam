@@ -4,13 +4,14 @@
   <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
   <arg name="enable_floor_detection" default="true" />
 
+  <!-- <arg name="points_topic" default="/sensing/lidar/top/pointcloud" /> -->
   <arg name="points_topic" default="/ouster/points" />
-  <arg name="lidar_tf" default="base_link" />
+  <arg name="lidar_tf" default="lidar" />
     <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
   <arg name="matching_algo" default="FAST_GICP" />
 
   <arg name="enable_gps" default="true" />
-  <arg name="gps_topic" default="/raw_fix" />
+  <arg name="gps_topic" default="/fix" />
   <arg name="gps_tf" default="/imu" />
   
   <arg name="enable_imu_deskewing" default="false" />
@@ -26,10 +27,17 @@
   <arg name="enable_robot_odometry_init_guess" default="false" />
   <arg name="robot_odom_frame_id" default="robot_odom" />
 
+  <!-- NIRO -->
   <!-- transformation between lidar and base_link -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0.887 0 2.13 3.141592 0 0 base_link $(arg lidar_tf) 10" /> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="gps2base_publisher" args="0.359 0 1.7 0 0 0 base_link $(arg gps_tf) 10" /> -->
-  <node pkg="tf" type="static_transform_publisher" name="imu2base_publisher" args="0 0 0.88 3.141592 0 0 base_link $(arg imu_tf) 10" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="imu2base_publisher" args="0 0 0.88 3.141592 0 0 base_link $(arg imu_tf) 10" /> -->
+ 
+  <!-- AVANTE -->
+  <!-- transformation between lidar and base_link -->
+  <node pkg="tf" type="static_transform_publisher" name="lidar2base_publisher" args="0.930 0 1.852 0.0 0 0 base_link $(arg lidar_tf) 10" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="gps2base_publisher" args="0.359 0 1.7 0 0 0 base_link $(arg gps_tf) 10" /> -->
+  <node pkg="tf" type="static_transform_publisher" name="imu2base_publisher" args="-0.05675 0 0.81166 0 0 0 base_link $(arg imu_tf) 10" />
   
   <!-- in case you use velodyne_driver, comment out the following line -->
   <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -44,14 +52,14 @@
     <!-- distance filter -->
     <param name="use_distance_filter" value="true" />
     <param name="distance_near_thresh" value="10.0" />
-    <param name="distance_far_thresh" value="200.0" />
+    <param name="distance_far_thresh" value="150.0" />
     <!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
     <param name="downsample_method" value="NONE" />
     <param name="downsample_resolution" value="0.2" />
     <!-- NONE, RADIUS, or STATISTICAL -->
     <param name="outlier_removal_method" value="RADIUS" />
-    <param name="statistical_mean_k" value="30" />
-    <param name="statistical_stddev" value="1.1" />
+    <param name="statistical_mean_k" value="20" />
+    <param name="statistical_stddev" value="0.3" />
     <param name="radius_radius" value="0.5" />
     <param name="radius_min_neighbors" value="2" />
   </node>
@@ -70,7 +78,6 @@
     <param name="transform_thresholding" value="false" />
     <param name="max_acceptable_trans" value="100.0" />
     <param name="max_acceptable_angle" value="3.0" />
-    <!-- 이게 문제인가 -->
     <param name="downsample_method" value="NONE" />
     <param name="downsample_resolution" value="0.3" />
     <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
@@ -120,7 +127,7 @@
     <!-- 최대 업데이트 키프레임 갯수 -->
     <param name="max_keyframes_per_update" value="10" />
     <!-- 해당 값보다 작으면 keyframe을 반영안함 / 하나라도 크면 반영 -->
-    <param name="keyframe_delta_trans" value="7.5" />
+    <param name="keyframe_delta_trans" value="5.0" />
     <param name="keyframe_delta_angle" value="0.75" />
     <!-- fix first node for optimization stability -->
     <param name="fix_first_node" value="true"/>
@@ -129,36 +136,39 @@
     <!-- loop closure params -->
     <!-- 여기  -->
     <!-- 해당 값보다 거리가 크면 루프 검색 안함 / 키프레임 간의 위치가 너무 크면 검사 안함-->
+    <!-- <param name="distance_thresh" value="5.0" /> -->
     <param name="distance_thresh" value="30.0" />
-    <!-- <param name="distance_thresh" value="15.0" /> -->
     <!-- 이동 거리가 해당 값보다 작으면 루프 검색 안함 / 너무 가까운 키 프레임끼리 검사 안함 -->
-    <param name="accum_distance_thresh" value="80.0" />
-    <!-- <param name="accum_distance_thresh" value="20.0" /> -->
+    <param name="accum_distance_thresh" value="60.0" />
     <!-- 마지막 루프 위치와 최소 거리 -->
     <param name="min_edge_interval" value="40.0" />
     <!-- 정확도가 아래값보다 낮아야 루프로 판단 -->
-    <param name="fitness_score_thresh" value="2.2" />
+    <param name="fitness_score_thresh" value="2.0" />
 
     <!-- scan matching params -->
     <param name="registration_method" value="$(arg matching_algo)" />
     <param name="reg_num_threads" value="0" />
     <param name="reg_transformation_epsilon" value="0.001"/>
     <param name="reg_maximum_iterations" value="256"/>
-    <param name="reg_max_correspondence_distance" value="0.5"/>
+    <param name="reg_max_correspondence_distance" value="0.3"/>
     <param name="reg_max_optimizer_iterations" value="20"/>
     <param name="reg_use_reciprocal_correspondences" value="false"/>
-    <param name="reg_correspondence_randomness" value="40"/>
+    <param name="reg_correspondence_randomness" value="60"/>
     <param name="reg_resolution" value="1.0" />
     <param name="reg_nn_search_method" value="DIRECT7" />
     <!-- edge params -->
     <!-- GPS -->
+    <!-- <param name="gps_edge_robust_kernel" value="NONE" /> -->
+    <!-- <param name="gps_edge_robust_kernel_size" value="1.0" /> -->
     <param name="gps_edge_robust_kernel" value="PseudoHuber" />
     <param name="gps_edge_robust_kernel_size" value="0.001" />
+    <param name="gps_rate" value="8" />
+    
     <!-- 값이 낮을 수록 높은 신뢰도가 높음 -->
-    <!-- <param name="gps_edge_stddev_xy" value="0.05" />
-    <param name="gps_edge_stddev_z" value="0.75" /> -->
-    <param name="gps_edge_stddev_xy" value="20.0" />
+    <param name="gps_edge_stddev_xy" value="25.0" />
     <param name="gps_edge_stddev_z" value="10.0" />
+    <!-- <param name="gps_edge_stddev_xy" value="0.1" /> -->
+    <!-- <param name="gps_edge_stddev_z" value="0.75" /> -->
     <!-- IMU orientation -->
     <param name="imu_orientation_edge_robust_kernel" value="NONE" />
     <param name="imu_orientation_edge_stddev" value="1.0" />
@@ -178,7 +188,8 @@
     <param name="use_const_inf_matrix" value="false" />
     <param name="const_stddev_x" value="0.25" />
     <param name="const_stddev_q" value="0.05" />
-    <param name="var_gain_a" value="20.0" />
+    <!-- <param name="var_gain_a" value="20.0" /> -->
+    <param name="var_gain_a" value="1.0" />
     <param name="min_stddev_x" value="0.1" />
     <param name="max_stddev_x" value="5.0" />
     <param name="min_stddev_q" value="0.05" />
