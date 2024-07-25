@@ -9,7 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /root/catkin_ws/src
+
 RUN /bin/bash -c '. /opt/ros/noetic/setup.bash; catkin_init_workspace'
+RUN echo 'alias cm='catkin_make --cmake-args -DCMAKE_BUILD_TYPE=Release' >> ~/.bashrc
+RUN echo 'source /root/catkin_ws/devel/setup.bash' >> ~/.bashrc
 
 WORKDIR /root/catkin_ws
 
